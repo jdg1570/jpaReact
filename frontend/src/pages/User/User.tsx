@@ -12,15 +12,15 @@ import Papa from 'papaparse';
 import {Pencil, Trash2} from "lucide-react";
 
 const initialData = [
-    { id: 1, age: '30', name: '김철수', gender: "남",  email: 'chulsoo@example.com', status: '활성' },
-    { id: 2, age: '41', name: '이영희', gender: "여",  email: 'younghee@example.com', status: '비활성' },
-    { id: 3, age: '17', name: '홍길동', gender: "남",  email: 'hong@example.com', status: '활성' }
+    { id: 1, age: 30, name: '김철수', gender: "남",  email: 'chulsoo@example.com', status: '활성' },
+    { id: 2, age: 41, name: '이영희', gender: "여",  email: 'younghee@example.com', status: '비활성' },
+    { id: 3, age: 17, name: '홍길동', gender: "남",  email: 'hong@example.com', status: '활성' }
 
 ];
 
 type User = {
     id: number;
-    age: string;
+    age: number;
     name: string;
     gender: string;
     email: string;
@@ -47,9 +47,10 @@ export default function DataTable() {
                 const rowData = info.row.original;
                 return (
                     <div className="flex items-center gap-2">
-                        <button onClick={() => handleEdit(rowData)}>
-                            <Pencil size={15}  />
+                        <button onClick={() => handleEdit(rowData)} aria-label="Edit">
+                            <Pencil size={15} />
                         </button>
+
                         <button onClick={() => handleDelete(rowData)}>
                             <Trash2 size={15}  />
                         </button>
@@ -77,10 +78,16 @@ export default function DataTable() {
     });
 
     const downloadCSV = () => {
-        const csv = Papa.unparse(data);
+        const csv = Papa.unparse({
+            fields: ['ID', '나이', '이름', '성별', '이메일', '상태'],
+            data: data.map(row => [
+                row.id, row.age, row.name, row.gender, row.email, row.status
+            ])
+        });
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         saveAs(blob, 'table-data.csv');
     };
+
 
     const handleEdit = (user: User) => {
         alert(`수정: ${user.name}`);
