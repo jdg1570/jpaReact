@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {
     useReactTable,
     getCoreRowModel,
@@ -10,13 +10,12 @@ import {
 import { saveAs } from 'file-saver';
 import Papa from 'papaparse';
 import {Pencil, Trash2} from "lucide-react";
+import axios from "axios";
+import {API_BASE_URL} from "../../config.ts";
 
-const initialData = [
-    { id: 1, age: 30, name: '김철수', gender: "남",  email: 'chulsoo@example.com', status: '활성' },
-    { id: 2, age: 41, name: '이영희', gender: "여",  email: 'younghee@example.com', status: '비활성' },
-    { id: 3, age: 17, name: '홍길동', gender: "남",  email: 'hong@example.com', status: '활성' }
 
-];
+
+
 
 type User = {
     id: number;
@@ -29,9 +28,34 @@ type User = {
 
 
 export default function DataTable() {
-    const [data] = useState(initialData);
+    const [data, setData] = useState<User[]>([]);
     const [globalFilter, setGlobalFilter] = useState('');
     const [sorting, setSorting] = useState<SortingState>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+
+    useEffect(() => {
+        fetchUsers(globalFilter);
+    }, []);
+
+    useEffect(() => {
+        // 검색어 바뀔 때마다 자동 조회 (선택)
+        fetchUsers(globalFilter);
+    }, [globalFilter]);
+
+    const fetchUsers = async (filter: string) => {
+        setLoading(true);
+        try {
+            const response = await axios.post(`${API_BASE_URL}/getUserList`, {
+                search: filter,  // 서버에서 이 키워드에 맞춰 구현되어 있어야 함
+            });
+            setData(response.data);
+        } catch (error) {
+            console.error('회원 목록 불러오기 실패:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     const columns: ColumnDef<User>[] = useMemo(() => [
         { accessorKey: 'id', header: 'ID' },
@@ -47,20 +71,17 @@ export default function DataTable() {
                 const rowData = info.row.original;
                 return (
                     <div className="flex items-center gap-2">
-                        <button onClick={() => handleEdit(rowData)} aria-label="Edit">
+                        <button onClick={() => handleEdit(rowData)} title="수정">
                             <Pencil size={15} />
                         </button>
-
-                        <button onClick={() => handleDelete(rowData)}>
-                            <Trash2 size={15}  />
+                        <button onClick={() => handleDelete(rowData)} title="삭제">
+                            <Trash2 size={15} />
                         </button>
                     </div>
                 );
             }
-
         },
     ], []);
-
 
     const table = useReactTable({
         data,
@@ -112,7 +133,11 @@ export default function DataTable() {
                         placeholder="검색어를 입력하세요"
                         className="rounded border border-gray-300 px-3 py-1 text-sm"
                         value={globalFilter ?? ''}
-                        onChange={e => setGlobalFilter(e.target.value)}
+                        onChange={(e) => {
+                            setGlobalFilter(e.target.value);
+                            // 검색어가 바뀌자마자 POST 요청
+                            fetchUsers(e.target.value);
+                        }}
                     />
                     <button
                         onClick={downloadCSV}

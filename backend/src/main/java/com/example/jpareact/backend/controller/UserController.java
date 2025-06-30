@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 @RestController
-@RequestMapping("/User")
+@RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:3003")
 public class UserController {
 
@@ -16,6 +16,5 @@ public class UserController {
     public ModelAndView getUser(HttpServletRequest request) {
         return new ModelAndView("user/user");
     }
-
 
 }
