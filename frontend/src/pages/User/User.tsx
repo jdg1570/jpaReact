@@ -16,7 +16,6 @@ import {API_BASE_URL} from "../../config.ts";
 
 
 
-
 type User = {
     id: number;
     age: number;
@@ -37,16 +36,16 @@ export default function DataTable() {
         fetchUsers(globalFilter);
     }, []);
 
-    useEffect(() => {
-        // 검색어 바뀔 때마다 자동 조회 (선택)
-        fetchUsers(globalFilter);
-    }, [globalFilter]);
+    // useEffect(() => {
+    //     // 검색어 바뀔 때마다 자동 조회 (선택)
+    //     fetchUsers(globalFilter);
+    // }, [globalFilter]);
 
     const fetchUsers = async (filter: string) => {
         setLoading(true);
         try {
-            const response = await axios.post(`${API_BASE_URL}/getUserList`, {
-                search: filter,  // 서버에서 이 키워드에 맞춰 구현되어 있어야 함
+            console.log("호출 성공")
+            const response = await axios.get(`${API_BASE_URL}/user/getAllUsers`, {
             });
             setData(response.data);
         } catch (error) {
