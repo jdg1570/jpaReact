@@ -36,15 +36,10 @@ export default function DataTable() {
         fetchUsers(globalFilter);
     }, []);
 
-    // useEffect(() => {
-    //     // 검색어 바뀔 때마다 자동 조회 (선택)
-    //     fetchUsers(globalFilter);
-    // }, [globalFilter]);
 
     const fetchUsers = async (filter: string) => {
         setLoading(true);
         try {
-            console.log("호출 성공")
             const response = await axios.get(`${API_BASE_URL}/user/getAllUsers`, {
             });
             setData(response.data);
@@ -57,7 +52,7 @@ export default function DataTable() {
 
 
     const columns: ColumnDef<User>[] = useMemo(() => [
-        { accessorKey: 'id', header: 'ID' },
+        { accessorKey: 'userId', header: 'ID' },
         { accessorKey: 'age', header: '나이' },
         { accessorKey: 'name', header: '이름' },
         { accessorKey: 'gender', header: '성별' },
