@@ -3,7 +3,7 @@ package com.example.jpareact.backend.dto;
 import com.example.jpareact.backend.entity.UserEntity;
 
 public record UserResDto (
-    Long id,
+    Long userId,
     String name,
     String email,
     int age,
@@ -12,7 +12,7 @@ public record UserResDto (
 ){
     public static UserResDto fromEntity(UserEntity user) {
         return new UserResDto(
-                user.getId(),
+                user.getUserId(),
                 user.getName(),
                 user.getEmail(),
                 user.getAge(),
