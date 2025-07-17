@@ -17,7 +17,7 @@ import {API_BASE_URL} from "../../config.ts";
 
 
 type User = {
-    id: number;
+    userId: number;
     age: number;
     name: string;
     gender: string;
@@ -55,9 +55,17 @@ export default function DataTable() {
         { accessorKey: 'userId', header: 'ID' },
         { accessorKey: 'age', header: '나이' },
         { accessorKey: 'name', header: '이름' },
-        { accessorKey: 'gender', header: '성별' },
+        { accessorKey: 'gender', header: '성별',
+            cell: (info: CellContext<User, string>) => {
+                const rowData = info.row.original;
+                return rowData.gender === "male" ? "남" : "여";
+            }},
         { accessorKey: 'email', header: '이메일' },
-        { accessorKey: 'status', header: '상태' },
+        { accessorKey: 'status', header: '상태',
+            cell: (info: CellContext<User, string>) => {
+                const rowData = info.row.original;
+                return rowData.status === "Y" ? "활성" : "비활성"
+            }},
         {
             id: 'actions',
             header: '액션',
@@ -96,10 +104,11 @@ export default function DataTable() {
         const csv = Papa.unparse({
             fields: ['ID', '나이', '이름', '성별', '이메일', '상태'],
             data: data.map(row => [
-                row.id, row.age, row.name, row.gender, row.email, row.status
+                row.userId, row.age, row.name, row.gender, row.email, row.status
             ])
         });
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const csvWithBOM = '\uFEFF' + csv;
+        const blob = new Blob([csvWithBOM], { type: 'text/csv;charset=utf-8;' });
         saveAs(blob, 'table-data.csv');
     };
 
